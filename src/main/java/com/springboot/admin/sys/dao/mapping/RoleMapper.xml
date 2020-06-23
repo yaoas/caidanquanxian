@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springboot.admin.sys.dao.RoleMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.springboot.admin.sys.entity.Role" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="openStatus" column="open_status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		        a.id AS "id",
+                a.role_name AS "roleName",
+                a.remark AS "remark",
+                a.create_time AS "createTime"
+        </sql>
+    <insert id="saveMenuPerms" parameterType="map">
+        insert into sys_role_menu (role_id,menu_id,del_flag)
+        values (#{param.roleId},#{param.menuId},0)
+       <!-- <foreach collection ="role.menuIds" item="menuId" index= "index" separator =",">
+            (
+            #{role.id}, #{menuId}
+            )
+        </foreach >-->
+    </insert>
+    <delete id="delMenuPermByRoleId">
+        update  sys_role_menu set  del_flag = 1 where role_id = #{roleId}
+    </delete>
+
+    <select id="selectPageList" resultType="com.springboot.admin.sys.entity.Role">
+        SELECT sr.id,sr.role_name  roleName,sr.remark,sr.create_time createTime,sr.open_status openStatus, GROUP_CONCAT(sm.`name`) AS menuNames , GROUP_CONCAT(DISTINCT sm.`id`) AS menuIdsStr FROM `sys_role` sr,`sys_role_menu` srm,`sys_menu` sm WHERE  sr.`id`=srm.`role_id` AND srm.`menu_id`=sm.`id`AND sr.del_flag = 0
+        AND srm.del_flag = 0
+        AND sm.del_flag = 0
+        <where>
+            <if test="role.roleName != null and role.roleName != ''">
+               and sr.role_name LIKE concat('%',#{role.roleName},'%')
+            </if>
+        </where>
+        GROUP BY sr.`id`
+    </select>
+
+    <select id="getCountByRoleId" resultType="java.lang.Integer">
+        select count(1) from sys_user_role
+        where role_id = #{roleId} AND del_flag = 0
+    </select>
+    <select id="getCheckMenuIds" resultType="java.lang.Long">
+        select menu_id from sys_role_menu where role_id = #{roleId} AND del_flag = 0;
+    </select>
+    <select id="selectIfHaveChildren"  resultType="java.lang.Integer" parameterType="com.springboot.admin.sys.entity.Menu" >
+         select  count(1) from sys_menu where parent_id = #{parentId} AND del_flag = 0
+    </select>
+</mapper>

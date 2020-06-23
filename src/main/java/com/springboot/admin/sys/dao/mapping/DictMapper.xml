@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springboot.admin.sys.dao.DictMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.springboot.admin.sys.entity.Dict" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="num" column="num"/>
+        <result property="pid" column="pid"/>
+        <result property="name" column="name"/>
+        <result property="tips" column="tips"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+           id,
+           num,
+           pid,
+           name,
+           tips
+    </sql>
+
+    <select id="getByType" parameterType="string" resultType="com.springboot.admin.sys.entity.Dict">
+        select * from sys_dict where pid = (select id from sys_dict where `name` = #{type} and  del_flag = 0) and  del_flag = 0
+    </select>
+     <select id="byIdGetName"  resultType="java.lang.String">
+         select  name  from sys_dict where id = #{id} and  del_flag = 0
+     </select>
+</mapper>

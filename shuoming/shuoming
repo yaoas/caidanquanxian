@@ -1,0 +1,6 @@
+请求完登录接口后
+把返回的参数token放在请求头
+Authorization这个字段，去请求其他接口 参数 用户名_token
+在JwtFilter中判断登录用户是否为活跃用户，先从redis中获取用户，然后根据结果判断jwt是否过期，
+过期刷新token,然后刷新redis缓存
+这样就算验证登录过了
