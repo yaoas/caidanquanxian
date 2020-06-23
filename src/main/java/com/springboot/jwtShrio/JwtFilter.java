@@ -1,6 +1,7 @@
 package com.springboot.jwtShrio;
 
 import com.springboot.common.RedisConfig.RedisUtil;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.filter.AccessControlFilter;
 
@@ -43,6 +44,18 @@ public class JwtFilter extends AccessControlFilter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String jwtArrays = request.getHeader("Authorization");
         //从缓存里面获取token是否过期,如果过期直接返回false
+//        Object o = bean.get(jwtArrays);
+//        if(o==null || "".equals(o)){
+//            onLoginFail(servletResponse);
+//            return false;
+//        }
+//        String stringToken = String.valueOf(o);
+//
+//        //如果没有过期，直接拿出token
+//        String[] s = jwtArrays.split("_");
+//        String jwtName =  s[0];
+//        String jwt = stringToken;
+
         Object o = bean.get(jwtArrays);
         if(o==null || "".equals(o)){
             onLoginFail(servletResponse);
@@ -51,9 +64,10 @@ public class JwtFilter extends AccessControlFilter {
         String stringToken = String.valueOf(o);
 
         //如果没有过期，直接拿出token
-        String[] s = jwtArrays.split("_");
-        String jwtName =  s[0];
+        String jwtName =  jwtArrays;
         String jwt = stringToken;
+
+
         String newToken = "";
         //判断token过期
         JwtUtil jwtUtil = new JwtUtil();

@@ -99,8 +99,12 @@ public class UserController extends BaseController {
     @ApiOperation("保存用户")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public Object save(@Valid @RequestBody User user) throws UnsupportedEncodingException {
-
-        return R.ok();
+        boolean save = userService.save(user);
+        if(save){
+            return R.ok();
+        }else {
+            return R.fail();
+        }
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
@@ -121,12 +125,10 @@ public class UserController extends BaseController {
 
     @ApiOperation("用户详情")
     @RequestMapping(value = "/info", method = RequestMethod.POST)
-    public R info(@RequestBody Map<String, Long> map) {
-
-        return R.ok();
+    public R info(@RequestBody User user) {
+        User byId = userService.getById(user.getId());
+        return R.ok(byId);
     }
-
-
 
     /**
      * @return com.pm.background.common.utils.R

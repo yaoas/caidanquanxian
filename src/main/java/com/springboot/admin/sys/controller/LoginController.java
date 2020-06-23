@@ -1,6 +1,7 @@
 package com.springboot.admin.sys.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.springboot.admin.sys.dto.LoginForm;
 import com.springboot.admin.sys.entity.User;
@@ -45,29 +46,30 @@ public class LoginController {
 
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public Object login(String username, String password) {
-        Map<String, String> map = new HashMap<>();
-        if (!"tom".equals(username) || !"123".equals(password)) {
-            map.put("msg", "用户名密码错误");
-            return ResponseEntity.ok(map);
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("account",username);
+        queryWrapper.eq("password",password);
+        int count = iUserService.count(queryWrapper);
+        if(count == 0){
+            return R.fail("账户密码错误");
         }
         //判断redis中是否有同一个账号登录
+        Object o = redisUtil.get(username);
+        if(o!=null){
+            return R.fail("该账户已经登录");
+        }
         //有的话 直接返回
         JwtUtil jwtUtil = new JwtUtil();
         Map<String, Object> chaim = new HashMap<>();
         chaim.put("username", username);
         String jwtToken = jwtUtil.encode(username, 5 * 60 * 1000, chaim);
-        String returnData = username + "_" +jwtToken;
-        redisUtil.set(returnData,jwtToken,20*60);
-        map.put("msg", "登录成功");
-        map.put("token", returnData);
-        return R.ok(map);
+        //String returnData = username + "_" +jwtToken;
+       // redisUtil.set(returnData,jwtToken,20*60);
+        redisUtil.set(username,jwtToken,20*60);
+        //map.put("msg", "登录成功");
+       // map.put("token", returnData);
+        return R.ok(username);
     }
-//    @RequestMapping(value = "/login",method = RequestMethod.POST)
-//    @ApiOperation(value="登陆方法")
-//    public Object login(@RequestBody LoginForm loginForm, HttpServletRequest request) {
-//        return R.ok();
-//    }
-
 
     /**
      * 退出
