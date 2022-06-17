@@ -20,7 +20,7 @@
         <mybatis-plus-boot-starter.version>3.0-RC1</mybatis-plus-boot-starter.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <swagger.version>2.9.2</swagger.version>
-        <fastjson.version>1.2.47</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
     </properties>
 
     <dependencies>
